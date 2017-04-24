@@ -1,0 +1,67 @@
+class Heap ::
+  constructor( scoreFn, compareFn ) ::
+    this.contents = []
+    this.scoreFn = scoreFn !== undefined ? scoreFn : ( x ) => x
+    this.compareFn = compareFn !== undefined ? compareFn : ( a, b ) => a < b
+
+  toString() :: return this.contents
+
+  size() :: return this.contents.length
+
+  contains( item ) :: return this.contents.indexOf( item ) >= 0
+
+  push( nodes ) ::
+    if !Array.isArray(nodes) :: nodes = [ nodes ]
+    nodes.forEach @ ( node ) => ::
+      this.contents.push @ node
+      this.bubbleUp @ this.size() - 1
+    return nodes
+
+  pop() ::
+    let result = this.contents[0]
+    let end = this.contents.pop()
+
+    if this.size() > 0 ::
+      this.contents[0] = end
+      this.sinkDown @ 0
+
+    return result
+
+  swap( a, b ) ::
+    const t = this.contents[a]
+    this.contents[a] = this.contents[b]
+    this.contents[b] = t
+    return a
+
+  getIndexScore( index ) :: return this.scoreFn @ this.contents[index]
+
+  getParentIndex( index ) :: return Math.floor @ (index - 1) / 2
+
+  bubbleUp( index ) ::
+    if index > 0 ::
+        const parentIndex = this.getParentIndex @ index
+        if this.compareFn @ this.getIndexScore( index ), this.getIndexScore( parentIndex ) ::
+          this.bubbleUp @ this.swap @ parentIndex, index
+
+  sinkDown( parentIndex ) ::
+    if parentIndex < this.size() ::
+        const parentScore = this.getIndexScore @ parentIndex
+        const leftIndex = parentIndex * 2 + 1
+        const rightIndex = parentIndex * 2 + 2
+        var swapIdx
+
+        if leftIndex < this.size() ::
+          const leftIndexScore = this.getIndexScore @ leftIndex
+          if this.compareFn @ leftIndexScore, parentScore ::
+            swapIdx = leftIndex
+        
+        if rightIndex < this.size() ::
+          const rightIndexScore = this.getIndexScore @ rightIndex
+          if this.compareFn @ rightIndexScore, ( swapIdx !== undefined ? leftIndexScore : parentScore ) ::
+            swapIdx = rightIndex
+
+        if swapIdx !== undefined ::
+          this.sinkDown @ this.swap @ swapIdx, parentIndex
+
+
+module.exports = Heap

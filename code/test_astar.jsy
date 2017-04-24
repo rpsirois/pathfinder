@@ -1,0 +1,67 @@
+const AStar = require @ '../dist/astar.js'
+
+let start = ::
+    name: 'start',
+    weight: 0,
+    isGoal: false,
+    edges: []
+
+let pathA1 = ::
+    name: 'A1',
+    weight: 2,
+    isGoal: false,
+    edges: []
+
+let pathA2 = ::
+    name: 'A2',
+    weight: 10,
+    isGoal: false,
+    edges: []
+
+let pathA3 = ::
+    name: 'A3',
+    weight: 1,
+    isGoal: false,
+    edges: []
+
+let pathB1 = ::
+    name: 'B1',
+    weight: 1,
+    isGoal: false,
+    edges: []
+
+let pathB2 = ::
+    name: 'B2',
+    weight: 1,
+    isGoal: false,
+    edges: []
+
+let pathB3 = ::
+    name: 'B3',
+    weight: 12,
+    isGoal: false,
+    edges: []
+
+let goal = ::
+    name: 'goal',
+    weight: 0,
+    isGoal: true,
+    edges: []
+
+start.edges = [ pathA1, pathB1 ]
+pathA1.edges = [ start, pathA2 ]
+pathA2.edges = [ pathA1, pathA3, pathB2 ]
+pathA3.edges = [ pathA2, goal ]
+pathB1.edges = [ start, pathB2 ]
+pathB2.edges = [ pathB1, pathB3, pathA2 ]
+pathB3.edges = [ pathB2, goal ]
+goal.edges = [ pathA3, pathB3 ]
+
+const heurFn = ( node, start ) => 1
+const goalFn = ( node ) => node.isGoal
+const succFn = ( node ) => node.edges
+const costFn = ( node ) => node.weight
+
+let pathfinder = new AStar @ heurFn, goalFn, succFn, costFn
+
+console.log @ pathfinder.find @ start
