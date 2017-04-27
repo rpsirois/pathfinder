@@ -1,0 +1,28 @@
+const _goap = require @ '../dist/planner.js'
+
+let goal = new _goap.Goal @ 'KillEnemy', ::
+    kTargetIsDead: true
+
+let actions = @[]
+    new _goap.Action @
+        'Attack'
+        , @{} kWeaponIsLoaded: true
+        , @{} kTargetIsDead: true
+
+    , new _goap.Action @
+        'LoadWeapon'
+        , @{} kWeaponIsArmed: true
+        , @{} kWeaponIsLoaded: true
+
+    , new _goap.Action @
+        'DrawWeapon'
+        , {}
+        , @{} kWeaponIsArmed: true
+
+let agent = new _goap.Agent()
+
+agent.goals.push @ goal.clone()
+
+actions.forEach @ action => agent.addAction @ action.clone()
+
+agent.getPlan()

@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "babel -s inline -x .js,.jsy code -d dist",
+    "buildDemo": "babel -s inline -x .js,.jsy demo -d demo",
     "watch": "npm -s run build -- --watch",
     "test": "babel-node code/example.jsy"
   },
@@ -21,5 +22,10 @@
   "license": "ISC",
   "babel": {
     "plugins": "offside-js"
+  },
+  "dependencies": {
+    "babel-plugin-inferno": "^3.2.0",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-preset-es2015": "^6.24.1"
   }
 }

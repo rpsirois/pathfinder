@@ -1,0 +1,117 @@
+const AStar = require @ '../dist/astar.js'
+const Heap = require @ '../dist/heap.js'
+
+
+class GOAP ::
+    constructor( agent ) ::
+        this.agent = agent
+
+    formulate() ::
+        let goal = this.agent.getGoal()
+        let finalActions = []
+
+        console.log @ 'Formulating plan for ' + goal
+
+        // TODO allow for composite of actions to accomplish goal
+        this.agent.actions.forEach @ ( action ) => ::
+            if action.satisfies @ goal :: finalActions.push @ action
+
+        if finalActions.length === 0 :: return []
+
+        let heurFn = ( node, root ) => 0
+        let goalFn = node => this.agent.stateSatisfies @ node
+        let succFn = node => node.chain
+        let costFn = node => node.cost
+
+        console.log @ 'Starting search with action ' + finalActions[0]
+
+        let planner = new AStar @ heurFn, goalFn, succFn, costFn
+        let path = planner.find @ finalActions.pop()
+        path.reverse()
+
+
+        if path.length === 0 ::
+            console.log @ 'No plan found!'
+        else ::
+            console.log @ 'Plan:'
+            path.forEach @ action => console.log @ '\t' + action
+
+
+class Agent ::
+    constructor() ::
+        this.planner = new GOAP @ this
+        this.goals = new Heap()
+        this.actions = []
+        this.state = {}
+
+    getGoal() :: return this.goals.peek()
+
+    addAction( anAction ) ::
+        this.actions.forEach @ action => ::
+            if anAction.satisfies @ action :: action.chain.push @ anAction
+            if action.satisfies @ anAction :: anAction.chain.push @ action
+
+        this.actions.push @ anAction
+
+    stateSatisfies( anIntermediateState ) ::
+        let targetState = anIntermediateState.conditions
+
+        for let tsKey in targetState ::
+            let tsValue = targetState[tsKey]
+
+            if this.state[tsKey] != tsValue :: return false
+
+        return true
+
+    getPlan() :: return this.planner.formulate()
+        
+
+
+class IntermediateState ::
+    constructor( key, conditions={} ) ::
+        this.key = key
+        this.conditions = conditions
+
+    toString() :: return this.key
+
+    satisfies( anIntermediateState ) :: return new Error @ 'An IntermediateState must implement @satisfies( anIntermediateState ).'
+
+    clone() :: return new Error @ 'An IntermediateState must implement @clone().'
+
+
+class Action extends IntermediateState ::
+    constructor( key, conditions={}, effects={}, cost=0 ) ::
+        super @ key, conditions
+        this.effects = effects
+        this.cost = cost
+        this.chain = []
+
+    satisfies( anIntermediateState ) ::
+        let state = anIntermediateState.conditions
+        
+        for let eKey in this.effects ::
+            let eVal = this.effects[eKey]
+
+            for let sKey in state ::
+                let sVal = state[sKey]
+
+                if eKey == sKey && eVal == sVal :: return true
+
+        return false
+
+    clone() :: return Object.assign @ new Action(), this
+
+
+class Goal extends IntermediateState ::
+    constructor( key, conditions={}, priority=0 ) ::
+        super @ key, conditions
+        this.priority = priority
+
+    clone() :: return Object.assign @ new Goal(), this
+
+
+module.exports = ::
+    GOAP: GOAP
+    , Agent: Agent
+    , Action: Action
+    , Goal: Goal

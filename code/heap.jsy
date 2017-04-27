@@ -10,6 +10,8 @@ class Heap ::
 
   contains( item ) :: return this.contents.indexOf( item ) >= 0
 
+  peek() :: return this.contents[0]
+
   push( nodes ) ::
     if !Array.isArray(nodes) :: nodes = [ nodes ]
     nodes.forEach @ ( node ) => ::

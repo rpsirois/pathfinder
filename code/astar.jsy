@@ -9,9 +9,9 @@ class AStar ::
 
     _nodeify( data, prev=null ) ::
         data._astar_data = ::
-            g: this.costFn( data ),
-            h: this.heurFn( data, this.start ),
-            prev: prev
+            g: this.costFn( data )
+            , h: this.heurFn( data, this.start )
+            , prev: prev
         return data
 
     _step() ::
