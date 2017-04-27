@@ -6,6 +6,7 @@ class ActionView extends Inferno.Component ::
     render() ::
         return Inferno.createElement @ 'div', {}, ::[]
             Inferno.createElement @ 'p', {}, 'Key: ' + this.state.key
+            , Inferno.createElement @ 'p', {}, 'aKey: ' + this.state.aKey
             , Inferno.createElement @ 'p', {}, 'Conditions:'
             , Inferno.createElement @ 'ul', {}, Object.keys( this.state.conditions ).map( key => Inferno.createElement @ 'li', {}, key + ': ' + this.state.conditions[key] )
             , Inferno.createElement @ 'ul', {}, Object.keys( this.state.effects ).map( key => Inferno.createElement @ 'li', {}, key + ': ' + this.state.effects[key] )
@@ -14,5 +15,8 @@ let exampleAction = new Planner.Action @
     'Attack'
     , @{} kWeaponIsLoaded: true
     , @{} kTargetIsDead: true
+
+console.log @ exampleAction
+exampleAction.aKey = exampleAction.key
 
 Inferno.render @ Inferno.createElement( ActionView, exampleAction ), document.getElementById @ 'container'
