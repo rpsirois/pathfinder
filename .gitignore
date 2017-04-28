@@ -7,3 +7,5 @@ node_modules
 *.swp
 **/*.swp
 offsideREADME.md
+yarn.lock
+yarn.error
