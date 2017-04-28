@@ -9,19 +9,29 @@
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "babel-plugin-offside-js": "^0.6.4"
+    "babel-plugin-offside-js": "^0.6.4",
+    "babel-preset-jsy": "^0.6.3",
+    "http-server": "^0.9.0"
   },
   "scripts": {
     "build": "babel -s inline -x .js,.jsy code -d dist",
     "buildDemo": "babel -s inline -x .js,.jsy demo -d demo",
     "watch": "npm -s run build -- --watch",
-    "test": "babel-node code/example.jsy"
+    "test": "babel-node code/example.jsy",
+    "try": "yarn run buildDemo; cd demo && http-server"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "babel": {
-    "plugins": "offside-js"
+    "plugins": [
+      "syntax-jsx",
+      "inferno",
+      "offside-js"
+    ],
+    "presets": [
+      "es2015"
+    ]
   },
   "dependencies": {
     "babel-plugin-inferno": "^3.2.0",

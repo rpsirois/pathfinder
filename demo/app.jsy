@@ -1,7 +1,7 @@
 class ActionView extends Inferno.Component ::
-    constructor( action ) ::
+    constructor( props ) ::
         super()
-        this.state = action
+        this.state = props.action
 
     render() ::
         return Inferno.createElement @ 'div', {}, ::[]
@@ -11,12 +11,36 @@ class ActionView extends Inferno.Component ::
             , Inferno.createElement @ 'ul', {}, Object.keys( this.state.conditions ).map( key => Inferno.createElement @ 'li', {}, key + ': ' + this.state.conditions[key] )
             , Inferno.createElement @ 'ul', {}, Object.keys( this.state.effects ).map( key => Inferno.createElement @ 'li', {}, key + ': ' + this.state.effects[key] )
 
+const renderIt = bool => bool ? 'true' : 'false'
+class ActionViewSecond extends Inferno.Component ::
+    constructor( props ) ::
+        super(props)
+        console.log @ 'props', props
+        this.state = {
+          action:props.action
+        }
+
+    render() ::
+        let action = this.state.action
+        console.log @ action
+        let conditionListOne = Object.keys( action.conditions ).map( key => (<li> key : {renderIt(action.conditions[key])}</li>) )
+        let conditionListTwo = Object.keys( action.effects ).map( key => (<li> key :  {renderIt(action.effects[key])}</li>) )
+        return @
+            <div>
+              <p> Key: {action.key} </p>
+              <p> 'Conditions:'
+                <ul>{conditionListOne}</ul>
+                <ul>{conditionListTwo}</ul>
+              </p>
+            </div>
+
 let exampleAction = new Planner.Action @
     'Attack'
-    , @{} kWeaponIsLoaded: true
+    , @{} kWeaponIsLoaded: false
     , @{} kTargetIsDead: true
 
-console.log @ exampleAction
-exampleAction.aKey = exampleAction.key
-
-Inferno.render @ Inferno.createElement( ActionView, exampleAction ), document.getElementById @ 'container'
+//Inferno.render @ Inferno.createElement( ActionView, exampleAction ), document.getElementById @ 'container'
+//Inferno.render @ <ActionViewSecond action={exampleAction}/>, node  // This one should work, but it doesn't =(
+//
+let node = document.getElementById @ 'container'
+Inferno.render @ Inferno.createElement(ActionViewSecond, {action:exampleAction}), node
