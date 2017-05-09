@@ -29,12 +29,13 @@ class GOAP ::
         let path = planner.find @ finalActions.pop()
         path.reverse()
 
-
         if path.length === 0 ::
             console.log @ 'No plan found!'
         else ::
             console.log @ 'Plan:'
             path.forEach @ action => console.log @ '\t' + action
+
+        return path
 
 
 class Agent ::
@@ -52,6 +53,14 @@ class Agent ::
             if action.satisfies @ anAction :: anAction.chain.push @ action
 
         this.actions.push @ anAction
+
+        return anAction
+
+    removeAction( anAction ) ::
+        this.actions = this.actions.filter @ ea => anAction !== ea
+        this.actions.forEach @ action => :: action.chain = action.chain.filter @ ea => anAction !== ea
+
+        return anAction
 
     stateSatisfies( anIntermediateState ) ::
         let targetState = anIntermediateState.conditions

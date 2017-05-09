@@ -1,0 +1,19 @@
+p, ul, ol, li { margin: 0px; }
+
+div.card {
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+div.card > button {
+    background-color: red;
+    float: right;
+}
+
+div.clearing { clear: both; }
+
+li.plancrumb {
+    color: blue;
+}
