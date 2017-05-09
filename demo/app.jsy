@@ -1,46 +1,25 @@
 class ActionView extends Inferno.Component ::
-    constructor( props ) ::
-        super()
-        this.state = props.action
+    constructor( props ) :: super @ props
+
+    renderBool( bool ) :: return bool ? 'true' : 'false'
 
     render() ::
-        return Inferno.createElement @ 'div', {}, ::[]
-            Inferno.createElement @ 'p', {}, 'Key: ' + this.state.key
-            , Inferno.createElement @ 'p', {}, 'aKey: ' + this.state.aKey
-            , Inferno.createElement @ 'p', {}, 'Conditions:'
-            , Inferno.createElement @ 'ul', {}, Object.keys( this.state.conditions ).map( key => Inferno.createElement @ 'li', {}, key + ': ' + this.state.conditions[key] )
-            , Inferno.createElement @ 'ul', {}, Object.keys( this.state.effects ).map( key => Inferno.createElement @ 'li', {}, key + ': ' + this.state.effects[key] )
+        let conditions = Object.keys( this.props.action.conditions ).map @ key => <li><strong>{ key }</strong>: { this.renderBool( this.props.action.conditions[key] ) }</li>
+        let effects = Object.keys( this.props.action.effects ).map @ key => <li><strong>{ key }</strong>: { this.renderBool( this.props.action.effects[key] ) }</li>
 
-const renderIt = bool => bool ? 'true' : 'false'
-class ActionViewSecond extends Inferno.Component ::
-    constructor( props ) ::
-        super(props)
-        console.log @ 'props', props
-        this.state = {
-          action:props.action
-        }
-
-    render() ::
-        let action = this.state.action
-        console.log @ action
-        let conditionListOne = Object.keys( action.conditions ).map( key => (<li> key : {renderIt(action.conditions[key])}</li>) )
-        let conditionListTwo = Object.keys( action.effects ).map( key => (<li> key :  {renderIt(action.effects[key])}</li>) )
         return @
             <div>
-              <p> Key: {action.key} </p>
-              <p> 'Conditions:'
-                <ul>{conditionListOne}</ul>
-                <ul>{conditionListTwo}</ul>
+              <p>Key: { this.props.action.key }</p>
+              <p>Conditions:
+                <ul>{ conditions }</ul>
+                <ul>{ effects }</ul>
               </p>
             </div>
 
 let exampleAction = new Planner.Action @
     'Attack'
     , @{} kWeaponIsLoaded: false
-    , @{} kTargetIsDead: true
+    , @{} kTargetIsDead: false
 
-//Inferno.render @ Inferno.createElement( ActionView, exampleAction ), document.getElementById @ 'container'
-//Inferno.render @ <ActionViewSecond action={exampleAction}/>, node  // This one should work, but it doesn't =(
-//
-let node = document.getElementById @ 'container'
-Inferno.render @ Inferno.createElement(ActionViewSecond, {action:exampleAction}), node
+let container = document.getElementById @ 'container'
+Inferno.render @ <ActionView action={ exampleAction } />, container
