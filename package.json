@@ -4,9 +4,6 @@
   "private": true,
   "description": "",
   "main": "index.js",
-  "xxxdependencies": {
-    "babel-preset-jsy": "^0.6.3"
-  },
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-plugin-offside-js": "^0.6.4",
@@ -30,7 +27,14 @@
       "inferno"
     ],
     "presets": [
-        ["jsy", {"targets": {"browser": true}}]
+      [
+        "jsy",
+        {
+          "targets": {
+            "browser": true
+          }
+        }
+      ]
     ]
   },
   "dependencies": {

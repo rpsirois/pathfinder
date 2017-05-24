@@ -136,16 +136,44 @@ var Heap = function () {
       return this.contents[0];
     }
   }, {
+    key: "remove",
+    value: function remove(node) {
+      var _this = this;
+
+      var next = function next(idx) {
+        if (_this.size() == 0) {
+          return null;
+        }
+
+        if (_this.contents[idx] == node) {
+          var endNode = _this.contents.pop();
+          if (node === endNode) {
+            return node;
+          } else {
+            _this.contents[idx] = endNode;
+            _this.bubbleUp(idx);
+            _this.sinkDown(idx);
+            return node;
+          }
+        } else if (_this.size() - 1 == idx) {
+          return null;
+        } else {
+          return next(idx + 1);
+        }
+      };
+      return next(0);
+    }
+  }, {
     key: "push",
     value: function push(nodes) {
-      var _this = this;
+      var _this2 = this;
 
       if (!Array.isArray(nodes)) {
         nodes = [nodes];
       }
       nodes.forEach(function (node) {
-        _this.contents.push(node);
-        _this.bubbleUp(_this.size() - 1);
+        _this2.contents.push(node);
+        _this2.bubbleUp(_this2.size() - 1);
       });
       return nodes;
     }
@@ -199,9 +227,9 @@ var Heap = function () {
         var rightIndex = parentIndex * 2 + 2;
         var swapIdx;
 
+        var leftIndexScore = this.getIndexScore(leftIndex);
         if (leftIndex < this.size()) {
-          var _leftIndexScore = this.getIndexScore(leftIndex);
-          if (this.compareFn(_leftIndexScore, parentScore)) {
+          if (this.compareFn(leftIndexScore, parentScore)) {
             swapIdx = leftIndex;
           }
         }
@@ -251,6 +279,11 @@ var GOAP = function () {
             var _this = this;
 
             var goal = this.agent.getGoal();
+
+            if (typeof goal === 'undefined') {
+                return [];
+            }
+
             var finalActions = [];
 
             console.log('Formulating plan for ' + goal);
@@ -294,7 +327,7 @@ var GOAP = function () {
                 });
             }
 
-            return path;
+            return { goal: goal, path: path };
         }
     }]);
 

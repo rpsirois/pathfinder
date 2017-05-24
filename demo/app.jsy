@@ -26,18 +26,23 @@ const actions = @[]
 
 
 class GoalView extends Inferno.Component ::
-    constructor( props ) :: super @ props
-
-    dosomething = ( evt ) => :: console.log @ 'clicked as prop', @{} this: this, evt
+    constructor( props ) ::
+        super @ props
+        this.state = {
+            editing: false
+        }
 
     renderBool( bool ) :: return bool ? 'true' : 'false'
 
     render() ::
-        let conditions = Object.keys( this.props.goal.conditions ).map @ key => <li><strong>{ key }</strong>: { this.renderBool( this.props.goal.conditions[key] ) }</li>
+        let conditions = Object.keys( this.props.goal.conditions ).map @ key => <li><strong>{ key }</strong>: { typeof this.props.goal.conditions[key] === 'boolean' ? this.renderBool( this.props.goal.conditions[key] ) : this.props.goal.conditions[key] }</li>
+        const exitModal = () => :: this.setState @ { editing: false }
+        const update = () => :: this.setState()
 
         return @
             <div class="card">
-                <button onClick={ this.dosomething }>X</button>
+                <button onClick={ e => this.props.removeGoal() }>X</button>
+                <button onClick={ e => this.setState( { editing: true } ) }>E</button>
                 <div class="clearing"></div>
                 <p>Key: <strong>{ this.props.goal.key }</strong></p>
                 <p>Priority: <strong>{ this.props.goal.priority }</strong></p>
@@ -45,7 +50,81 @@ class GoalView extends Inferno.Component ::
                     Conditions:
                     <ul>{ conditions }</ul>
                 </p>
+                { this.state.editing ? <GoalEditor goal={ this.props.goal } exitModal={ exitModal } update={ update } /> : '' }
             </div>
+
+class GoalEditor extends Inferno.Component ::
+    constructor( props ) ::
+        super @ props
+        this.state = {
+            c: 0
+        }
+
+    save = ( fields ) => ::
+        let newConditions = {}
+
+        for let i = 0; i <= this.state.c; i++ ::
+            let key, val
+
+            fields.forEach @ field => ::
+                if field[0] == 'condition' + i + 'key' :: key = field[1]
+                if field[0] == 'condition' + i + 'val' :: val = field[1]
+
+            if typeof key !== 'undefined' :: newConditions[key] = val
+
+        this.props.goal.conditions = newConditions
+        this.props.exitModal()
+
+    removeCondition = ( key ) => ::
+        delete this.props.goal.conditions[key]
+        this.props.update()
+
+    addBlankCondition = ( e ) => ::
+        this.props.goal.conditions[ 'newCondition' + (new Date()).getTime() ] = null
+        this.props.update()
+
+    render() ::
+        let conditions = Object.keys( this.props.goal.conditions ).map @ ( key ) => ::
+            let cn = this.state.c++
+            return @
+                <p>
+                    <button type="button" onClick={ e => this.removeCondition( key ) }>X</button>
+                    <input type="text" name={ 'condition' + cn + 'key' } placeholder="Condition Key" value={ key }></input>
+                    <input type="text" name={ 'condition' + cn + 'val' } placeholder="Condition Value" value={ this.props.goal.conditions[key] }></input>
+                </p>
+
+        return @
+            <div class="overlay">
+                <div class="modal">
+                    <div class="modal-header">
+                        <div class="clearing"></div>
+                        <button class="modal-close-btn" onClick={ () => this.props.exitModal() }>X</button>
+                        <hr style="clear: both;" />
+                    </div>
+                    <div class="modal-content">
+                        <label>
+                            Key:
+                            <input type="text" name="key" placeholder="Key" value={ this.props.goal.key }></input>
+                        </label>
+                        <br />
+                        <label>
+                            Priority:
+                            <input type="number" min="0" step="1" name="priority" placeholder="Priority" value={ this.props.goal.priority }></input>
+                        </label>
+                        <p>Conditions:</p>
+                        <form class="goalEditorForm" onSubmit={ e => { e.preventDefault(), this.save( Array.from( new FormData( e.target ) ) ) } } >
+                            { conditions }
+                        </form>
+                        <button onClick={ this.addBlankCondition }>Add New Condition</button>
+                    </div>
+                    <div class="modal-footer">
+                        <hr />
+                        <button onClick={ this.close }>Cancel</button>
+                        <button onClick={ e => document.getElementsByClassName( 'goalEditorForm' )[0].dispatchEvent( new CustomEvent('submit', {bubbles: true, cancelable: true}) ) }>Save</button>
+                    </div>
+                </div>
+            </div>
+
 
 class ActionView extends Inferno.Component ::
     constructor( props ) :: super @ props
@@ -58,7 +137,7 @@ class ActionView extends Inferno.Component ::
 
         return @
             <div class="card">
-                <button onClick={ evt => this.props.removeAction() }>X</button>
+                <button onClick={ e => this.props.removeAction() }>X</button>
                 <div class="clearing"></div>
                 <p>Key: <strong>{ this.props.action.key }</strong></p>
                 <p>
@@ -78,9 +157,14 @@ class PlanView extends Inferno.Component ::
     constructor( props ) :: super @ props
 
     render() ::
-        if this.props.crumbs.length ::
-            let crumbs = this.props.crumbs.map @ crumb => <PlanCrumbView crumb={ crumb.key } />
-            return @ <ol>{ crumbs }</ol>
+        if this.plan && this.props.plan.crumbs.length ::
+            let crumbs = this.props.plan.crumbs.map @ crumb => <PlanCrumbView crumb={ crumb.key } />
+
+            return @
+                <div>
+                    <p>Zee plan to <strong>{ this.props.plan.goal.key }</strong>:</p>
+                    <ol>{ crumbs }</ol>
+                </div>
         else ::
             return @ <p>No result.</p>
 
@@ -97,6 +181,10 @@ class App extends Inferno.Component ::
             agent: agent
             , plan: agent.getPlan()
 
+    removeGoal( aGoal ) ::
+        this.state.agent.goals.remove @ aGoal
+        this.setState @ { plan: this.state.agent.getPlan() }
+
     removeAction( anAction ) ::
         this.state.agent.removeAction @ anAction
         this.setState @ { plan: this.state.agent.getPlan() }
@@ -105,14 +193,16 @@ class App extends Inferno.Component ::
         const actions = this.state.agent.actions.map @ action =>
             <ActionView key={ action.key } action={ action } removeAction={ () => this.removeAction( action ) } />
 
+        const goals = this.state.agent.goals.contents.map @ goal =>
+            <GoalView key={ goal.key } goal={ goal } removeGoal={ () => this.removeGoal( goal ) } />
+
         return @
             <div>
                 <p>Zee goalz:</p>
-                <GoalView goal={ this.state.agent.getGoal() } />
+                { goals }
                 <p>Zee akshunz:</p>
                 { actions }
-                <p>Zee plan:</p>
-                <PlanView crumbs={ this.state.plan } />
+                <PlanView plan={ this.state.plan } />
             </div>
 
 let container = document.getElementById @ 'container'

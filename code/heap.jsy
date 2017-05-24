@@ -12,6 +12,26 @@ class Heap ::
 
   peek() :: return this.contents[0]
 
+  remove( node ) ::
+    const next = ( idx ) => ::
+        if this.size() == 0 :: return null
+
+        if this.contents[idx] == node ::
+            let endNode = this.contents.pop()
+            if node === endNode ::
+                return node
+            else ::
+                this.contents[idx] = endNode
+                this.bubbleUp @ idx
+                this.sinkDown @ idx
+                return node
+        else
+            if this.size() - 1 == idx ::
+                return null
+            else ::
+                return next @ idx + 1
+    return next @ 0
+
   push( nodes ) ::
     if !Array.isArray(nodes) :: nodes = [ nodes ]
     nodes.forEach @ ( node ) => ::
@@ -52,8 +72,8 @@ class Heap ::
         const rightIndex = parentIndex * 2 + 2
         var swapIdx
 
+        const leftIndexScore = this.getIndexScore @ leftIndex
         if leftIndex < this.size() ::
-          const leftIndexScore = this.getIndexScore @ leftIndex
           if this.compareFn @ leftIndexScore, parentScore ::
             swapIdx = leftIndex
         

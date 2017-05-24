@@ -8,6 +8,9 @@ class GOAP ::
 
     formulate() ::
         let goal = this.agent.getGoal()
+
+        if typeof goal === 'undefined' :: return []
+
         let finalActions = []
 
         console.log @ 'Formulating plan for ' + goal
@@ -35,7 +38,7 @@ class GOAP ::
             console.log @ 'Plan:'
             path.forEach @ action => console.log @ '\t' + action
 
-        return path
+        return :: goal, path 
 
 
 class Agent ::
