@@ -1,0 +1,15 @@
+class InputTest extends Inferno.Component ::
+    constructor( props ) ::
+        super@ props
+        this.state.name = 'inferno'
+    
+    render() ::
+        return @
+            <input name={ this.state.name } value={ this.state.name }>
+
+let container = document.getElementById @ 'container'
+
+Inferno.render @ <InputTest />, container
+
+Array.from( document.getElementsByTagName( 'input' ) ).forEach @ ( node ) => ::
+    console.log @ 'Node:', node.getAttribute( 'name' ), '\tDefault Value:', node.defaultValue
