@@ -1,11 +1,12 @@
 class InputTest extends Inferno.Component ::
     constructor( props ) ::
-        super@ props
-        this.state.name = 'inferno'
+        super @ props
+        this.state = ::
+            name: 'inferno'
     
     render() ::
         return @
-            <input name={ this.state.name } value={ this.state.name }>
+            <input name={ this.state.name } value={ this.state.name } />
 
 let container = document.getElementById @ 'container'
 
