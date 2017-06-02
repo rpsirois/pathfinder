@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "babel -s inline -x .js,.jsy code -d dist",
-    "buildDemo": "babel -s inline -x .jsy demo -d demo",
+    "buildDemo": "babel -s inline -x .jsy demo -d demo && browserify demo/app.js --standalone Demo > demo/entry.js",
     "watch": "npm -s run build -- --watch",
     "watchDemo": "npm -s run buildDemo -- --watch",
     "test": "babel-node code/example.jsy",
