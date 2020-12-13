@@ -1,44 +1,23 @@
 {
-  "name": "goap2",
-  "version": "1.0.0",
   "private": true,
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.0",
+  "files": [
+    "dist/",
+    "code/"
+  ],
+  "dependencies": {
+    "source-map-support": "^0.5.16"
+  },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-plugin-offside-js": "^0.6.4",
-    "babel-preset-jsy": "^0.7.2",
-    "http-server": "^0.9.0"
+    "@rollup/plugin-json": "^4.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.3",
+    "rollup": "^1.32.0",
+    "rollup-plugin-jsy-lite": "^1.6.4"
   },
   "scripts": {
-    "build": "babel -s inline -x .js,.jsy code -d dist",
-    "buildDemo": "babel -s inline -x .jsy demo -d demo && browserify demo/app.js --standalone Demo > demo/entry.js",
+    "clean": "rm -rf ./dist/*",
+    "build": "rollup --config",
     "watch": "npm -s run build -- --watch",
-    "watchDemo": "npm -s run buildDemo -- --watch",
-    "test": "babel-node code/example.jsy",
-    "try": "yarn run buildDemo; cd demo && http-server"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "babel": {
-    "plugins": [
-      "syntax-jsx",
-      "inferno"
-    ],
-    "presets": [
-      [
-        "jsy",
-        {
-          "targets": {
-            "browser": true
-          }
-        }
-      ]
-    ]
-  },
-  "dependencies": {
-    "babel-plugin-inferno": "^3.2.0",
-    "babel-plugin-syntax-jsx": "^6.18.0"
+    "start": "node ./dist/test_astar.cjs"
   }
 }

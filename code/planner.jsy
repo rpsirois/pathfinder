@@ -1,8 +1,8 @@
-const AStar = require @ '../dist/astar.js'
-const Heap = require @ '../dist/heap.js'
+import { AStar } from './astar.jsy'
+import { Heap } from './heap.jsy'
 
 
-class GOAP ::
+export class GOAP ::
     constructor( agent ) ::
         this.agent = agent
 
@@ -13,20 +13,21 @@ class GOAP ::
 
         let finalActions = []
 
-        console.log @ 'Formulating plan for ' + goal
+        console.log @ `Formulating plan for ${ goal }.`
 
         // TODO allow for composite of actions to accomplish goal
-        this.agent.actions.forEach @ ( action ) => ::
-            if action.satisfies @ goal :: finalActions.push @ action
+        this.agent.actions.forEach @\ action ::
+            if action.satisfies @ goal ::
+                finalActions.push @ action
 
         if finalActions.length === 0 :: return []
 
-        let heurFn = ( node, root ) => 0
-        let goalFn = node => this.agent.stateSatisfies @ node
-        let succFn = node => node.chain
-        let costFn = node => node.cost
+        let heurFn = @\ node, root :: return 0
+        let goalFn = @\ node :: return this.agent.stateSatisfies @ node
+        let succFn = @\ node :: return node.chain
+        let costFn = @\ node :: return node.cost
 
-        console.log @ 'Starting search with action ' + finalActions[0]
+        console.log @ `Starting search with action ${ finalActions[0] }.`
 
         let planner = new AStar @ heurFn, goalFn, succFn, costFn
         let path = planner.find @ finalActions.pop()
@@ -36,23 +37,25 @@ class GOAP ::
             console.log @ 'No plan found!'
         else ::
             console.log @ 'Plan:'
-            path.forEach @ action => console.log @ '\t' + action
+            path.forEach @ action => console.log @ `\t${ action }`
 
-        return :: goal, path 
+        return @{} goal, path 
 
 
-class Agent ::
+export class Agent ::
     constructor() ::
         this.planner = new GOAP @ this
         this.goals = new Heap()
         this.actions = []
         this.state = {}
 
-    getGoal() :: return this.goals.peek()
+    getGoal() ::
+        return this.goals.peek()
 
     addAction( anAction ) ::
-        this.actions.forEach @ action => ::
+        this.actions.forEach @\ action ::
             if anAction.satisfies @ action :: action.chain.push @ anAction
+
             if action.satisfies @ anAction :: anAction.chain.push @ action
 
         this.actions.push @ anAction
@@ -60,8 +63,8 @@ class Agent ::
         return anAction
 
     removeAction( anAction ) ::
-        this.actions = this.actions.filter @ ea => anAction !== ea
-        this.actions.forEach @ action => :: action.chain = action.chain.filter @ ea => anAction !== ea
+        this.actions = this.actions.filter @\ ea :: return anAction !== ea
+        this.actions.forEach @\ action :: action.chain = action.chain.filter @\ ea :: return anAction !== ea
 
         return anAction
 
@@ -91,7 +94,7 @@ class IntermediateState ::
     clone() :: return new Error @ 'An IntermediateState must implement @clone().'
 
 
-class Action extends IntermediateState ::
+export class Action extends IntermediateState ::
     constructor( key, conditions={}, effects={}, cost=0 ) ::
         super @ key, conditions
         this.effects = effects
@@ -114,16 +117,9 @@ class Action extends IntermediateState ::
     clone() :: return Object.assign @ new Action(), this
 
 
-class Goal extends IntermediateState ::
+export class Goal extends IntermediateState ::
     constructor( key, conditions={}, priority=0 ) ::
         super @ key, conditions
         this.priority = priority
 
     clone() :: return Object.assign @ new Goal(), this
-
-
-module.exports = ::
-    GOAP: GOAP
-    , Agent: Agent
-    , Action: Action
-    , Goal: Goal

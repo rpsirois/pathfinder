@@ -1,89 +1,104 @@
-class Heap ::
-  constructor( scoreFn, compareFn ) ::
-    this.contents = []
-    this.scoreFn = scoreFn !== undefined ? scoreFn : ( x ) => x
-    this.compareFn = compareFn !== undefined ? compareFn : ( a, b ) => a < b
+function defaultScoreFn( x ) :: return x
+function defaultCompareFn( a, b ) :: return a < b
 
-  toString() :: return this.contents
+export class Heap ::
+    constructor( scoreFn=defaultScoreFn, compareFn=defaultCompareFn ) ::
+        this.contents = []
+        this.scoreFn = scoreFn
+        this.compareFn = compareFn
 
-  size() :: return this.contents.length
+    toString() ::
+        return this.contents
 
-  contains( item ) :: return this.contents.indexOf( item ) >= 0
+    size() ::
+        return this.contents.length
 
-  peek() :: return this.contents[0]
+    contains( item ) ::
+        return this.contents.indexOf( item ) >= 0
 
-  remove( node ) ::
-    const next = ( idx ) => ::
-        if this.size() == 0 :: return null
+    peek() ::
+        return this.contents[0]
 
-        if this.contents[idx] == node ::
-            let endNode = this.contents.pop()
-            if node === endNode ::
-                return node
-            else ::
-                this.contents[idx] = endNode
-                this.bubbleUp @ idx
-                this.sinkDown @ idx
-                return node
-        else
-            if this.size() - 1 == idx ::
-                return null
-            else ::
-                return next @ idx + 1
-    return next @ 0
+    remove( node ) ::
+        const next = ( idx ) => ::
+            if this.size() == 0 :: return null
 
-  push( nodes ) ::
-    if !Array.isArray(nodes) :: nodes = [ nodes ]
-    nodes.forEach @ ( node ) => ::
-      this.contents.push @ node
-      this.bubbleUp @ this.size() - 1
-    return nodes
+            if this.contents[idx] == node ::
+                let endNode = this.contents.pop()
+                if node === endNode ::
+                    return node
+                else ::
+                    this.contents[idx] = endNode
+                    this.bubbleUp @ idx
+                    this.sinkDown @ idx
+                    return node
+            else
+                if this.size() - 1 == idx ::
+                    return null
+                else ::
+                    return next @ idx + 1
 
-  pop() ::
-    let result = this.contents[0]
-    let end = this.contents.pop()
+        return next @ 0
 
-    if this.size() > 0 ::
-      this.contents[0] = end
-      this.sinkDown @ 0
+    push( nodes ) ::
+        if !Array.isArray @ nodes ::
+            nodes = @# nodes
 
-    return result
+        nodes.forEach @\ node => ::
+            this.contents.push @ node
+            this.bubbleUp @ this.size() - 1
 
-  swap( a, b ) ::
-    const t = this.contents[a]
-    this.contents[a] = this.contents[b]
-    this.contents[b] = t
-    return a
+        return nodes
 
-  getIndexScore( index ) :: return this.scoreFn @ this.contents[index]
+    pop() ::
+        let result = this.contents[0]
+        let end = this.contents.pop()
 
-  getParentIndex( index ) :: return Math.floor @ (index - 1) / 2
+        if this.size() > 0 ::
+            this.contents[0] = end
+            this.sinkDown @ 0
 
-  bubbleUp( index ) ::
-    if index > 0 ::
-        const parentIndex = this.getParentIndex @ index
-        if this.compareFn @ this.getIndexScore( index ), this.getIndexScore( parentIndex ) ::
-          this.bubbleUp @ this.swap @ parentIndex, index
+        return result
 
-  sinkDown( parentIndex ) ::
-    if parentIndex < this.size() ::
-        const parentScore = this.getIndexScore @ parentIndex
-        const leftIndex = parentIndex * 2 + 1
-        const rightIndex = parentIndex * 2 + 2
-        var swapIdx
+    swap( a, b ) ::
+        const t = this.contents[a]
 
-        const leftIndexScore = this.getIndexScore @ leftIndex
-        if leftIndex < this.size() ::
-          if this.compareFn @ leftIndexScore, parentScore ::
-            swapIdx = leftIndex
-        
-        if rightIndex < this.size() ::
-          const rightIndexScore = this.getIndexScore @ rightIndex
-          if this.compareFn @ rightIndexScore, ( swapIdx !== undefined ? leftIndexScore : parentScore ) ::
-            swapIdx = rightIndex
+        this.contents[a] = this.contents[b]
+        this.contents[b] = t
 
-        if swapIdx !== undefined ::
-          this.sinkDown @ this.swap @ swapIdx, parentIndex
+        return a
 
+    getIndexScore( index ) ::
+        return this.scoreFn @ this.contents[index]
 
-module.exports = Heap
+    getParentIndex( index ) ::
+        return Math.floor @ (index - 1) / 2
+
+    bubbleUp( index ) ::
+        if index > 0 ::
+            const parentIndex = this.getParentIndex @ index
+
+            if this.compareFn @ this.getIndexScore( index ), this.getIndexScore( parentIndex ) ::
+                this.bubbleUp @ this.swap @ parentIndex, index
+
+    sinkDown( parentIndex ) ::
+        if parentIndex < this.size() ::
+            const parentScore = this.getIndexScore @ parentIndex
+            const rightIndex = parentIndex * 2 + 2
+            const leftIndex = parentIndex * 2 + 1
+            let swapIdx
+
+            const leftIndexScore = this.getIndexScore @ leftIndex
+
+            if leftIndex < this.size() ::
+                if this.compareFn @ leftIndexScore, parentScore ::
+                    swapIdx = leftIndex
+            
+            if rightIndex < this.size() ::
+                const rightIndexScore = this.getIndexScore @ rightIndex
+
+                if this.compareFn @ rightIndexScore, ( swapIdx !== undefined ? leftIndexScore : parentScore ) ::
+                    swapIdx = rightIndex
+
+            if swapIdx !== undefined ::
+                this.sinkDown @ this.swap @ swapIdx, parentIndex

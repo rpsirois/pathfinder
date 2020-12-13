@@ -1,28 +1,28 @@
-const _goap = require @ '../dist/planner.js'
+import { GOAP, Goal, Action, Agent } from './planner.jsy'
 
-let goal = new _goap.Goal @ 'KillEnemy', ::
+let goal = new Goal @ 'KillEnemy', @{}
     kTargetIsDead: true
 
-let actions = @[]
-    new _goap.Action @
+let actions = @#
+    new Action @
         'Attack'
-        , @{} kWeaponIsLoaded: true
-        , @{} kTargetIsDead: true
+        @{} kWeaponIsLoaded: true
+        @{} kTargetIsDead: true
 
-    , new _goap.Action @
+    new Action @
         'LoadWeapon'
-        , @{} kWeaponIsArmed: true
-        , @{} kWeaponIsLoaded: true
+        @{} kWeaponIsArmed: true
+        @{} kWeaponIsLoaded: true
 
-    , new _goap.Action @
+    new Action @
         'DrawWeapon'
-        , {}
-        , @{} kWeaponIsArmed: true
+        {}
+        @{} kWeaponIsArmed: true
 
-let agent = new _goap.Agent()
+let agent = new Agent()
 
 agent.goals.push @ goal.clone()
 
-actions.forEach @ action => agent.addAction @ action.clone()
+actions.forEach @\ action :: return agent.addAction @ action.clone()
 
 agent.getPlan()

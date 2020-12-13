@@ -1,6 +1,6 @@
-const Heap = require @ '../dist/heap.js'
+import { Heap } from './heap.jsy'
 
-class AStar ::
+export class AStar ::
     constructor( heurFn, goalFn, succFn, costFn ) ::
         this.heurFn = heurFn
         this.goalFn = goalFn
@@ -8,10 +8,11 @@ class AStar ::
         this.costFn = costFn
 
     _nodeify( data, prev=null ) ::
-        data._astar_data = ::
-            g: this.costFn( data )
-            , h: this.heurFn( data, this.start )
-            , prev: prev
+        data._astar_data = @{}
+            g: this.costFn @ data
+            h: this.heurFn @ data, this.start
+            prev
+
         return data
 
     _step() ::
@@ -20,10 +21,11 @@ class AStar ::
 
         if this.goalFn @ current :: return this.traceback @ current
 
-        this.succFn( current ).forEach @ successor => ::
+        this.succFn( current ).forEach @\ successor ::
             if this.closed.indexOf( successor ) < 0 ::
                 if this.open.contains @ successor ::
                     let tempCost = current._astar_data.g + successor._astar_data.g
+
                     if tempCost < successor._astar_data.g ::
                         successor._astar_data.g = tempCost
                         successor._astar_data.prev = current
@@ -36,23 +38,23 @@ class AStar ::
 
     find( start ) ::
         this.start = start
-        this.open = new Heap @ ( node ) => node._astar_data.g + node._astar_data.h
+        this.open = new Heap @\ node :: return node._astar_data.g + node._astar_data.h
         this.closed = []
 
         this.open.push @ this._nodeify @ this.start
+
         return this._step()
         
     traceback( goal ) ::
-        let path = [ goal ]
-        let trace = ( node ) => ::
+        let path = @# goal
+        let trace = @\ node ::
             if node._astar_data.prev ::
                 path.push @ node._astar_data.prev
                 trace @ node._astar_data.prev
+
         trace @ goal
         path.reverse()
-        return path.map @ ( node ) => ::
+
+        return path.map @\ node ::
             delete node._astar_data
             return node
-
-
-module.exports = AStar
