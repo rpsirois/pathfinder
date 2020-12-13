@@ -22,28 +22,28 @@ class Heap {
         return this.contents[0]}
 
     remove( node ) {
-        const next = ( idx ) => {
+        const next = (( idx ) => {
             if (this.size() == 0) {return null}
 
             if (this.contents[idx] == node) {
                 let endNode = this.contents.pop();
+
                 if (node === endNode) {
                     return node}
-                else {
-                    this.contents[idx] = endNode;
-                    this.bubbleUp(idx);
-                    this.sinkDown(idx);
-                    return node} }
+
+                this.contents[idx] = endNode;
+                this.bubbleUp(idx);
+                this.sinkDown(idx);
+                return node}
             else
                 if (this.size() - 1 == idx) {
                     return null}
-                else {
-                    return next(idx + 1) } };
+
+                return next(idx + 1) });
 
         return next(0) }
 
     push( nodes ) {
-        console.log('push');
         if (!Array.isArray(nodes) ) {
             nodes =([nodes]); }
 
@@ -54,7 +54,6 @@ class Heap {
         return nodes}
 
     pop() {
-        console.log('pop');
         let result = this.contents[0];
         let end = this.contents.pop();
 
@@ -76,7 +75,7 @@ class Heap {
         return this.scoreFn(this.contents[index]) }
 
     getParentIndex( index ) {
-        return Math.floor((index - 1) / 2) }
+        return Math.floor( (index + 1) / 2 ) - 1}
 
     bubbleUp( index ) {
         if (index > 0) {
@@ -88,17 +87,18 @@ class Heap {
     sinkDown( parentIndex ) {
         if (parentIndex < this.size()) {
             const parentScore = this.getIndexScore(parentIndex);
-            const rightIndex = parentIndex * 2 + 2;
-            const leftIndex = parentIndex * 2 + 1;
+            const rightIndex = ( parentIndex + 1 ) * 2;
+            const leftIndex = rightIndex - 1;
             let swapIdx;
 
-            const leftIndexScore = this.getIndexScore(leftIndex);
-
             if (leftIndex < this.size()) {
+                let leftIndexScore = this.getIndexScore(leftIndex);
+
                 if (this.compareFn(leftIndexScore, parentScore) ) {
                     swapIdx = leftIndex;} }
 
             if (rightIndex < this.size()) {
+                let leftIndexScore = this.getIndexScore(leftIndex);
                 const rightIndexScore = this.getIndexScore(rightIndex);
 
                 if (this.compareFn(rightIndexScore, ( swapIdx !== undefined ? leftIndexScore : parentScore )) ) {
