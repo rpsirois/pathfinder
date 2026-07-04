@@ -125,7 +125,7 @@ class AStar {
 
     _nodeify( data, prev=null ) {
         data._astar_data ={
-            g: prev ? prev._astar_data.g + this.costFn(data) : this.costFn(data)
+            g: prev ? prev._astar_data.g + this.costFn(prev, data) : this.costFn(null, data)
           , h: this.heurFn(data, this.start)
           , prev};
 
@@ -140,7 +140,7 @@ class AStar {
         this.succFn( current ).forEach (( successor ) => {
             if (this.closed.indexOf( successor ) < 0) {
                 if (this.open.contains(successor) ) {
-                    let tempCost = current._astar_data.g + this.costFn(successor);
+                    let tempCost = current._astar_data.g + this.costFn(current, successor);
 
                     if (tempCost < successor._astar_data.g) {
                         successor._astar_data.g = tempCost;
@@ -236,7 +236,7 @@ goal.edges =([pathA3, pathB3]);
 const heurFn = (( node, start ) => { return 1});
 const goalFn = (( node ) => { return node.isGoal});
 const succFn = (( node ) => { return node.edges});
-const costFn = (( node ) => { return node.weight});
+const costFn = (( prev, node ) => { return node.weight});
 
 let pathfinder = new AStar(heurFn, goalFn, succFn, costFn);
 

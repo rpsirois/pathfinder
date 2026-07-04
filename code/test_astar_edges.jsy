@@ -18,7 +18,7 @@ function node( name, weight, h=0 ) ::
 const heurFn = @\ n :: return n.h
 const goalFn = @\ n :: return n.isGoal
 const succFn = @\ n :: return n.edges
-const costFn = @\ n :: return n.weight
+const costFn = @\ prev, n :: return n.weight
 
 function findNames( start ) ::
     const planner = new AStar @ heurFn, goalFn, succFn, costFn

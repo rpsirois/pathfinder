@@ -60,7 +60,7 @@ goal.edges = @# pathA3, pathB3
 const heurFn = @\ node, start :: return 1
 const goalFn = @\ node :: return node.isGoal
 const succFn = @\ node :: return node.edges
-const costFn = @\ node :: return node.weight
+const costFn = @\ prev, node :: return node.weight
 
 let pathfinder = new AStar @ heurFn, goalFn, succFn, costFn
 

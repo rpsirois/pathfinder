@@ -25,7 +25,7 @@ export class GOAP ::
         let heurFn = @\ node, root :: return 0
         let goalFn = @\ node :: return this.agent.stateSatisfies @ node
         let succFn = @\ node :: return node.chain
-        let costFn = @\ node :: return node.cost
+        let costFn = @\ prev, node :: return node.cost
 
         console.log @ `Starting search with action ${ finalActions[0] }.`
 
