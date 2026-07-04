@@ -43,6 +43,15 @@ class Heap {
 
         return next(0) }
 
+    update( node ) {
+        const idx = this.contents.indexOf(node);
+
+        if (idx < 0) {return null}
+
+        this.bubbleUp(idx);
+        this.sinkDown(idx);
+        return node}
+
     push( nodes ) {
         if (!Array.isArray(nodes) ) {
             nodes =([nodes]); }
@@ -116,7 +125,7 @@ class AStar {
 
     _nodeify( data, prev=null ) {
         data._astar_data ={
-            g: this.costFn(data)
+            g: prev ? prev._astar_data.g + this.costFn(data) : this.costFn(data)
           , h: this.heurFn(data, this.start)
           , prev};
 
@@ -131,11 +140,12 @@ class AStar {
         this.succFn( current ).forEach (( successor ) => {
             if (this.closed.indexOf( successor ) < 0) {
                 if (this.open.contains(successor) ) {
-                    let tempCost = current._astar_data.g + successor._astar_data.g;
+                    let tempCost = current._astar_data.g + this.costFn(successor);
 
                     if (tempCost < successor._astar_data.g) {
                         successor._astar_data.g = tempCost;
-                        successor._astar_data.prev = current;} }
+                        successor._astar_data.prev = current;
+                        this.open.update(successor); } }
                 else {
                     this.open.push(this._nodeify(successor, current)); } } });
 

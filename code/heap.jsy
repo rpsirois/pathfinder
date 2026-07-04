@@ -41,6 +41,15 @@ export class Heap ::
 
         return next @ 0
 
+    update( node ) ::
+        const idx = this.contents.indexOf @ node
+
+        if idx < 0 :: return null
+
+        this.bubbleUp @ idx
+        this.sinkDown @ idx
+        return node
+
     push( nodes ) ::
         if !Array.isArray @ nodes ::
             nodes = @# nodes

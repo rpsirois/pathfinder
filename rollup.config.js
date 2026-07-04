@@ -14,6 +14,7 @@ const plugins = [
 ]
 
 add_jsy('test_astar')
+add_jsy('test_astar_edges')
 add_jsy('test_goap')
 
 function add_jsy(src_name, module_name) {

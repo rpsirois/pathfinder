@@ -1,0 +1,93 @@
+import { AStar } from './astar.jsy'
+
+let failures = 0
+
+function check( label, actual, expected ) ::
+    const a = JSON.stringify @ actual
+    const e = JSON.stringify @ expected
+
+    if a === e ::
+        console.log @ `PASS ${ label }`
+    else ::
+        failures += 1
+        console.log @ `FAIL ${ label } - expected ${ e }, got ${ a }`
+
+function node( name, weight, h=0 ) ::
+    return @{} name, weight, h, isGoal: false, edges: []
+
+const heurFn = @\ n :: return n.h
+const goalFn = @\ n :: return n.isGoal
+const succFn = @\ n :: return n.edges
+const costFn = @\ n :: return n.weight
+
+function findNames( start ) ::
+    const planner = new AStar @ heurFn, goalFn, succFn, costFn
+    return planner.find( start ).map @ n => n.name
+
+// A chain of individually cheap nodes totals 5; the pricier pair totals 4.
+// Greedy best-first on node weight takes the t-chain; real A* takes the b-route.
+function test_greedy_trap() ::
+    const start = node @ 'start', 0
+    const t1 = node @ 't1', 1
+    const t2 = node @ 't2', 1
+    const t3 = node @ 't3', 1
+    const t4 = node @ 't4', 1
+    const t5 = node @ 't5', 1
+    const b1 = node @ 'b1', 2
+    const b2 = node @ 'b2', 2
+    const goal = node @ 'goal', 0
+    goal.isGoal = true
+
+    start.edges = @# t1, b1
+    t1.edges = @# t2
+    t2.edges = @# t3
+    t3.edges = @# t4
+    t4.edges = @# t5
+    t5.edges = @# goal
+    b1.edges = @# b2
+    b2.edges = @# goal
+
+    check @ 'greedy trap: picks cheapest total path', findNames(start), [ 'start', 'b1', 'b2', 'goal' ]
+
+// The inflated h on p1 pops p2 first, so mid enters the open set with
+// prev=p2 (g=3). Popping p1 later must re-parent mid to g=2 while it is
+// still open. Costs here are per-node, so with h=0 pops occur in
+// nondecreasing g order and this branch could never fire.
+function test_reparent() ::
+    const start = node @ 'start', 0
+    const p1 = node @ 'p1', 1, 3
+    const p2 = node @ 'p2', 2
+    const mid = node @ 'mid', 1, 5
+    const goal = node @ 'goal', 0
+    goal.isGoal = true
+
+    start.edges = @# p1, p2
+    p1.edges = @# mid
+    p2.edges = @# mid
+    mid.edges = @# goal
+
+    check @ 'reparent: cheaper late route re-parents open node', findNames(start), [ 'start', 'p1', 'mid', 'goal' ]
+
+function test_no_path() ::
+    const start = node @ 'start', 0
+    const dead = node @ 'dead', 1
+    const goal = node @ 'goal', 0
+    goal.isGoal = true
+
+    start.edges = @# dead
+    dead.edges = @# start
+
+    check @ 'no path: returns empty array', findNames(start), []
+
+function test_start_is_goal() ::
+    const start = node @ 'start', 0
+    start.isGoal = true
+
+    check @ 'start is goal: returns just the start node', findNames(start), [ 'start' ]
+
+test_greedy_trap()
+test_reparent()
+test_no_path()
+test_start_is_goal()
+
+if failures :: process.exitCode = 1
