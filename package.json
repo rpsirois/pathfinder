@@ -1,23 +1,45 @@
 {
-  "private": true,
+  "name": "astar-minimal",
   "version": "1.0.0",
-  "files": [
-    "dist/",
-    "code/"
-  ],
-  "dependencies": {
-    "source-map-support": "^0.5.16"
+  "description": "A minimal, dependency-free A* search over an arbitrary graph, plus the binary heap it builds on.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rpsirois/astar-minimal.git"
   },
+  "homepage": "https://github.com/rpsirois/astar-minimal#readme",
+  "bugs": {
+    "url": "https://github.com/rpsirois/astar-minimal/issues"
+  },
+  "keywords": [
+    "astar",
+    "a-star",
+    "pathfinding",
+    "graph",
+    "search",
+    "heap",
+    "priority-queue"
+  ],
+  "exports": {
+    ".": "./esm/index.js",
+    "./esm/*": "./esm/*"
+  },
+  "files": [
+    "esm/index.js",
+    "esm/index.js.map"
+  ],
   "devDependencies": {
-    "@rollup/plugin-json": "^4.0.2",
-    "@rollup/plugin-node-resolve": "^7.1.3",
-    "rollup": "^1.32.0",
-    "rollup-plugin-jsy-lite": "^1.6.4"
+    "rollup": "^2.79.0",
+    "rollup-plugin-jsy": "^1.7.5"
   },
   "scripts": {
-    "clean": "rm -rf ./dist/*",
+    "clean": "rm -rf ./esm/*",
+    "prebuild": "test -d ./node_modules || npm ci",
     "build": "rollup --config",
-    "watch": "npm -s run build -- --watch",
-    "start": "node ./dist/test_astar.cjs"
+    "watch": "rollup --config --watch",
+    "pretest": "npm -s run build",
+    "test": "node ./esm/test_astar.js && node ./esm/test_astar_edges.js",
+    "prepublishOnly": "npm run build"
   }
 }

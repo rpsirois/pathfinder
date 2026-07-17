@@ -1,27 +1,31 @@
-import rpi_resolve from '@rollup/plugin-node-resolve'
-import rpi_json from '@rollup/plugin-json'
-import rpi_jsy from 'rollup-plugin-jsy-lite'
+import {builtinModules} from 'module'
+import rpi_jsy from 'rollup-plugin-jsy'
 
-const configs = []
-export default configs
 
-const sourcemap = true
-const external = []
-const plugins = [
-    rpi_jsy(),
-    rpi_json(),
-    rpi_resolve(),
+const _rpis_ = (defines, ...args) => [
+  rpi_jsy({defines}),
+  ...args]
+
+
+const _cfg_ = {
+  external: id => (
+       /^\w*:/.test(id)
+    || builtinModules.includes(id)
+    ),
+  plugins: _rpis_({}) }
+
+
+export default [
+  ... add_jsy('index'),
+  ... add_jsy('test_astar'),
+  ... add_jsy('test_astar_edges'),
 ]
 
-add_jsy('test_astar')
-add_jsy('test_astar_edges')
-add_jsy('test_goap')
 
-function add_jsy(src_name, module_name) {
-  if (!module_name) module_name = src_name
+function * add_jsy(src_name, opt={}) {
+  const input = `code/${src_name}${opt.ext || '.jsy'}`
 
-  configs.push({
-    input: `code/${src_name}.jsy`,
-    output: { file: `dist/${src_name}.cjs`, format: 'cjs', exports:'named', sourcemap },
-    plugins, external })
+  yield { ..._cfg_, input, output: [
+      { file: `esm/${src_name}.js`, format: 'es', sourcemap: true, ...opt },
+    ]}
 }
