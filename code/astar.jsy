@@ -22,7 +22,17 @@ export class AStar ::
         if this.goalFn @ current :: return this.traceback @ current
 
         this.succFn( current ).forEach @\ successor ::
-            if this.closed.indexOf( successor ) < 0 ::
+            let closedIdx = this.closed.indexOf( successor )
+
+            if closedIdx >= 0 ::
+                let tempCost = current._astar_data.g + this.costFn(current, successor)
+
+                if tempCost < successor._astar_data.g ::
+                    this.closed.splice @ closedIdx, 1
+                    successor._astar_data.g = tempCost
+                    successor._astar_data.prev = current
+                    this.open.push @ successor
+            else ::
                 if this.open.contains @ successor ::
                     let tempCost = current._astar_data.g + this.costFn(current, successor)
 
