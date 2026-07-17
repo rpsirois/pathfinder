@@ -16,36 +16,35 @@ export class AStar ::
         return data
 
     _step() ::
-        let current = this.open.pop()
-        this.closed.push @ current
+        while this.open.size() > 0 ::
+            let current = this.open.pop()
+            this.closed.push @ current
 
-        if this.goalFn @ current :: return this.traceback @ current
+            if this.goalFn @ current :: return this.traceback @ current
 
-        this.succFn( current ).forEach @\ successor ::
-            let closedIdx = this.closed.indexOf( successor )
+            this.succFn( current ).forEach @\ successor ::
+                let closedIdx = this.closed.indexOf( successor )
 
-            if closedIdx >= 0 ::
-                let tempCost = current._astar_data.g + this.costFn(current, successor)
-
-                if tempCost < successor._astar_data.g ::
-                    this.closed.splice @ closedIdx, 1
-                    successor._astar_data.g = tempCost
-                    successor._astar_data.prev = current
-                    this.open.push @ successor
-            else ::
-                if this.open.contains @ successor ::
+                if closedIdx >= 0 ::
                     let tempCost = current._astar_data.g + this.costFn(current, successor)
 
                     if tempCost < successor._astar_data.g ::
+                        this.closed.splice @ closedIdx, 1
                         successor._astar_data.g = tempCost
                         successor._astar_data.prev = current
-                        this.open.update @ successor
+                        this.open.push @ successor
                 else ::
-                    this.open.push @ this._nodeify @ successor, current
+                    if this.open.contains @ successor ::
+                        let tempCost = current._astar_data.g + this.costFn(current, successor)
 
-        if this.open.size() == 0 :: return []
+                        if tempCost < successor._astar_data.g ::
+                            successor._astar_data.g = tempCost
+                            successor._astar_data.prev = current
+                            this.open.update @ successor
+                    else ::
+                        this.open.push @ this._nodeify @ successor, current
 
-        return this._step()
+        return []
 
     find( start ) ::
         this.start = start
@@ -58,12 +57,12 @@ export class AStar ::
         
     traceback( goal ) ::
         let path = @# goal
-        let trace = @\ node ::
-            if node._astar_data.prev ::
-                path.push @ node._astar_data.prev
-                trace @ node._astar_data.prev
+        let node = goal
 
-        trace @ goal
+        while node._astar_data.prev ::
+            node = node._astar_data.prev
+            path.push @ node
+
         path.reverse()
 
         return path.map @\ node ::

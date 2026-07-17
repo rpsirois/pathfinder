@@ -33,7 +33,7 @@ export class Heap ::
                 this.bubbleUp @ idx
                 this.sinkDown @ idx
                 return node
-            else
+            else ::
                 if this.size() - 1 == idx ::
                     return null
 
